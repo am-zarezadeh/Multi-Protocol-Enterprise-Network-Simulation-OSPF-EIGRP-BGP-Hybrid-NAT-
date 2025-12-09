@@ -1,0 +1,155 @@
+
+!
+! Last configuration change at 11:45:51 UTC Tue Dec 9 2025
+!
+version 15.2
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no service password-encryption
+service compress-config
+!
+hostname SW3
+!
+boot-start-marker
+boot-end-marker
+!
+!
+!
+no aaa new-model
+!
+!
+!
+!
+!
+no ip icmp rate-limit unreachable
+!
+!
+!
+no ip domain-lookup
+ip cef
+no ipv6 cef
+!
+!
+!
+spanning-tree mode pvst
+spanning-tree extend system-id
+!
+!
+vlan 1011,1215,1315,1415 
+!
+! 
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface Port-channel4
+ no shutdown
+ switchport trunk allowed vlan 32,114,1315
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+!
+interface Port-channel7
+ no shutdown
+ switchport trunk allowed vlan 143
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+!
+interface Ethernet0/0
+ no shutdown
+ switchport trunk allowed vlan 32,114,1315
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ channel-protocol lacp
+ channel-group 4 mode active
+!
+interface Ethernet0/1
+ no shutdown
+ switchport trunk allowed vlan 32,114,1315
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ channel-protocol lacp
+ channel-group 4 mode active
+!
+interface Ethernet0/2
+ no shutdown
+ switchport trunk allowed vlan 143
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ channel-protocol lacp
+ channel-group 7 mode active
+!
+interface Ethernet0/3
+ no shutdown
+ switchport trunk allowed vlan 143
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ channel-protocol lacp
+ channel-group 7 mode active
+!
+interface Ethernet1/0
+ no shutdown
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+!
+interface Ethernet1/1
+ no shutdown
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+!
+interface Ethernet1/2
+ no shutdown
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+!
+interface Ethernet1/3
+ no shutdown
+!
+interface Ethernet2/0
+ no shutdown
+!
+interface Ethernet2/1
+ no shutdown
+!
+interface Ethernet2/2
+ no shutdown
+!
+interface Ethernet2/3
+ no shutdown
+!
+ip forward-protocol nd
+!
+ip tcp synwait-time 5
+ip http server
+!
+ip ssh server algorithm encryption aes128-ctr aes192-ctr aes256-ctr
+ip ssh client algorithm encryption aes128-ctr aes192-ctr aes256-ctr
+!
+!
+!
+!
+!
+control-plane
+!
+!
+line con 0
+ exec-timeout 0 0
+ privilege level 15
+ logging synchronous
+line aux 0
+ exec-timeout 0 0
+ privilege level 15
+ logging synchronous
+line vty 0 4
+ login
+!
+!
+!
+end

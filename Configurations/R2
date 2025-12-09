@@ -1,0 +1,164 @@
+
+!
+version 15.7
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no service password-encryption
+!
+hostname R2
+!
+boot-start-marker
+boot-end-marker
+!
+!
+!
+no aaa new-model
+!
+!
+!
+mmi polling-interval 60
+no mmi auto-configure
+no mmi pvc
+mmi snmp-timeout 180
+!
+!
+!
+!
+!
+no ip icmp rate-limit unreachable
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+
+
+!
+!
+!
+!
+no ip domain lookup
+ip cef
+no ipv6 cef
+!
+multilink bundle-name authenticated
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+redundancy
+!
+no cdp log mismatch duplex
+!
+ip tcp synwait-time 5
+! 
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface Loopback0
+ no shutdown
+ ip address 2.2.2.2 255.255.255.255
+!
+interface Ethernet0/0
+ no shutdown
+ no ip address
+ duplex auto
+!
+interface Ethernet0/0.29
+ no shutdown
+ encapsulation dot1Q 29
+ ip address 10.9.2.2 255.255.255.252
+!
+interface Ethernet0/0.32
+ no shutdown
+ encapsulation dot1Q 32
+ ip address 10.2.3.1 255.255.255.252
+!
+interface Ethernet0/1
+ no shutdown
+ no ip address
+ duplex auto
+!
+interface Ethernet0/1.10
+ no shutdown
+ encapsulation dot1Q 10
+ ip address 172.16.1.1 255.255.255.0
+ ip helper-address 10.1.10.1
+!
+interface Ethernet0/2
+ no shutdown
+ no ip address
+ duplex auto
+!
+interface Ethernet0/3
+ no shutdown
+ no ip address
+ duplex auto
+!
+router ospf 1
+ network 2.2.2.2 0.0.0.0 area 0
+ network 10.2.3.0 0.0.0.3 area 0
+ network 10.2.9.0 0.0.0.3 area 0
+ network 172.16.1.0 0.0.0.255 area 0
+!
+router bgp 500
+ bgp log-neighbor-changes
+ network 10.9.2.0 mask 255.255.255.252
+ neighbor 10.2.3.2 remote-as 500
+ neighbor 10.2.3.2 next-hop-self
+ neighbor 10.9.2.1 remote-as 500
+ neighbor 10.9.2.1 next-hop-self
+!
+ip forward-protocol nd
+!
+!
+no ip http server
+no ip http secure-server
+!
+ipv6 ioam timestamp
+!
+!
+!
+control-plane
+!
+!
+!
+!
+!
+!
+!
+!
+line con 0
+ exec-timeout 0 0
+ privilege level 15
+ logging synchronous
+line aux 0
+ exec-timeout 0 0
+ privilege level 15
+ logging synchronous
+line vty 0 4
+ login
+ transport input none
+!
+!
+end

@@ -1,0 +1,151 @@
+
+!
+version 15.7
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no service password-encryption
+!
+hostname R11
+!
+boot-start-marker
+boot-end-marker
+!
+!
+!
+no aaa new-model
+!
+!
+!
+mmi polling-interval 60
+no mmi auto-configure
+no mmi pvc
+mmi snmp-timeout 180
+!
+!
+!
+!
+!
+no ip icmp rate-limit unreachable
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+
+
+!
+!
+!
+!
+no ip domain lookup
+ip cef
+no ipv6 cef
+!
+multilink bundle-name authenticated
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+redundancy
+!
+no cdp log mismatch duplex
+!
+ip tcp synwait-time 5
+! 
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface Ethernet0/0
+ no shutdown
+ no ip address
+ duplex auto
+!
+interface Ethernet0/0.111
+ no shutdown
+ encapsulation dot1Q 111
+ ip address 10.1.11.2 255.255.255.252
+!
+interface Ethernet0/0.114
+ no shutdown
+ encapsulation dot1Q 114
+ ip address 10.11.4.1 255.255.255.252
+!
+interface Ethernet0/0.1011
+ no shutdown
+ encapsulation dot1Q 1011
+ ip address 10.10.11.2 255.255.255.252
+!
+interface Ethernet0/1
+ no shutdown
+ no ip address
+ duplex auto
+!
+interface Ethernet0/2
+ no shutdown
+ no ip address
+ duplex auto
+!
+interface Ethernet0/3
+ no shutdown
+ no ip address
+ duplex auto
+!
+!
+router eigrp 1
+ network 10.1.11.0 0.0.0.3
+ network 10.10.11.0 0.0.0.3
+ network 10.11.4.0 0.0.0.3
+!
+ip forward-protocol nd
+!
+!
+no ip http server
+no ip http secure-server
+!
+ipv6 ioam timestamp
+!
+!
+!
+control-plane
+!
+!
+!
+!
+!
+!
+!
+!
+line con 0
+ exec-timeout 0 0
+ privilege level 15
+ logging synchronous
+line aux 0
+ exec-timeout 0 0
+ privilege level 15
+ logging synchronous
+line vty 0 4
+ login
+ transport input none
+!
+!
+end

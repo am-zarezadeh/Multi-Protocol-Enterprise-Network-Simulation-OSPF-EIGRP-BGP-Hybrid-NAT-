@@ -1,61 +1,62 @@
 # 🌐 Multi-Protocol Enterprise Network Simulation (OSPF, EIGRP, BGP, & Hybrid NAT)
 
-این پروژه، شبیه‌سازی یک شبکه سازمانی پیچیده و بزرگ است که برای نمایش مهارت‌های پیشرفته در Routing، Switching و عیب‌یابی (Troubleshooting) طراحی و پیاده‌سازی شده است. این سناریو شامل چندین پروتکل مسیریابی داخلی و خارجی و همچنین اتصال به اینترنت از طریق یک Gateway ترکیبی (Cisco Router + Windows Server) است.
+This project simulates a complex, large-scale enterprise network designed to showcase advanced skills in Routing, Switching, and Troubleshooting. The scenario involves multiple interior and exterior routing protocols, along with internet connectivity established via a hybrid NAT Gateway (Cisco Router + Windows Server).
 
 ---
 
-## 🎯 اهداف پروژه
+## 🎯 Project Goals
 
-*   پیاده‌سازی یک توپولوژی ستاره‌ای/چند لایه با استفاده از VLAN و Port-Channel در لایه ۲.
-*   استفاده همزمان از پروتکل‌های **OSPF** و **EIGRP** و انجام **Redistribution** بین آن‌ها.
-*   برقراری ارتباط با شبکه‌های خارجی (WAN) از طریق **BGP** (AS 400 و AS 500).
-*   پیاده‌سازی دسترسی به اینترنت برای کل شبکه داخلی از طریق **NAT** و عیب‌یابی مسیر برگشت.
-*   تزریق موفقیت‌آمیز **Default Route** در کل شبکه چند پروتکلی.
+*   Implement a multi-layer, star-topology using VLANs and Port-Channels (EtherChannel) at Layer 2.
+*   Simultaneously utilize **OSPF** and **EIGRP** and perform **Redistribution** between them.
+*   Establish connectivity with external networks (WAN) using **BGP** (AS 400 and AS 500).
+*   Implement internet access for the entire internal network via **NAT** and troubleshoot the return path.
+*   Successfully inject the **Default Route** across the entire multi-protocol network.
 
 ---
 
-## 🛠️ تکنولوژی‌ها و ابزارهای استفاده شده
+## 🛠️ Technologies and Tools Used
 
 *   **Routing Protocols:** OSPF (Area 0 & 1), EIGRP (AS 1), BGP (AS 400 & 500)
 *   **Switching:** VLANs, Trunking, Port-Channel (EtherChannel)
-*   **NAT Implementation:** Hybrid NAT (Cisco Router + Windows Server)
-*   **Virtualization:** Cisco IOS (در محیط شبیه‌سازی PNETLAB)
-*   **Operating System:** Windows Server (به عنوان NAT Gateway)
+*   **NAT Implementation:** Hybrid NAT (Cisco Router R15 + Windows Server)
+*   **Virtualization:** Cisco IOS (Simulated Environment like PNET/GNS3/EVE-NG)
+*   **Operating System:** Windows Server (as the NAT Gateway)
 
 ---
 
-## 🗺️ توپولوژی شبکه
+## 🗺️ Network Topology
 
 ![Physical Topology](topology-physical.jpg)
-### 💡 نکات کلیدی توپولوژی
 
-*   **Edge Router:** روتر R15 به عنوان نقطه خروجی به WAN/Internet عمل می‌کند.
-*   **Routing Cores:** روترهایی مانند R13 و R14 به عنوان ABR/ASBR برای اتصال پروتکل‌ها و Autonomous Systemهای مختلف عمل می‌کنند.
-*   **شبکه‌های داخلی:** شامل هر سه رنج Private استاندارد (`10.x.x.x`, `172.16.x.x`, `192.168.x.x`) است.
+### 💡 Key Topology Notes
+
+*   **Edge Router:** R15 serves as the exit point to the WAN/Internet.
+*   **Routing Cores:** Routers like R13 and R14 act as ABR/ASBR to connect different protocols and Autonomous Systems.
+*   **Internal Networks:** The network utilizes all three standard Private IP ranges (`10.x.x.x`, `172.16.x.x`, `192.168.x.x`).
 
 ---
 
-## ✅ خلاصه کانفیگ‌های حیاتی
+## ✅ Final Configuration Summary
 
-### ۱. پیاده‌سازی Default Route (Routing به اینترنت)
+### 1. Default Route Injection (Crucial for Internet Access)
 
-برای اطمینان از اینکه تمام روترهای داخلی مسیر اینترنت را می‌شناسند، Default Route از R15 به OSPF و از R13 به EIGRP تزریق شده است:
+To ensure all internal routers know the path to the internet, the Default Route was successfully injected from R15 into OSPF, and then from R13 into EIGRP:
 
-| روتر | پروتکل | دستور |
+| Router | Protocol | Command |
 | :--- | :--- | :--- |
 | **R15** | OSPF | `default-information originate` |
 | **R13** | EIGRP | `redistribute ospf 1 metric 10000 100 255 1 1500` |
 | **R15** | BGP | `neighbor 10.14.15.1 default-originate` |
 
-### ۲. کانفیگ NAT Gateway (Windows Server)
+### 2. Hybrid NAT Gateway Configuration (Windows Server)
 
-از آنجایی که Windows Server نقش NAT Gateway را ایفا می‌کند، مهم‌ترین بخش، تنظیم مسیر برگشت برای پاسخ‌های اینترنتی بود:
+Since the Windows Server acts as the NAT Gateway, the most critical step was configuring the return path for internet traffic:
 
-*   **R15:** Default Route به سمت Windows Server (`ip route 0.0.0.0 0.0.0.0 10.10.10.2`).
-*   **Windows Server:** Static Route برای تمام شبکه‌های داخلی به سمت R15 (`10.10.10.1`).
+*   **R15:** Configured with a Default Route pointing to the Windows Server (`ip route 0.0.0.0 0.0.0.0 10.10.10.2`).
+*   **Windows Server:** Required **Static Routes** to direct return traffic for all internal networks back to R15 (`10.10.10.1`).
 
 ```bash
-# Static Routes on Windows Server (Example)
+# Static Routes added on Windows Server (Example)
 route add 10.0.0.0 mask 255.0.0.0 10.10.10.1 -p
 route add 172.16.0.0 mask 255.240.0.0 10.10.10.1 -p
 route add 192.168.0.0 mask 255.255.0.0 10.10.10.1 -p
